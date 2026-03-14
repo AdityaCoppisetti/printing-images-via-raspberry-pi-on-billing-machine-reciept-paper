@@ -7,11 +7,6 @@ from datetime import datetime
 from PIL import Image, ImageEnhance, ImageFilter, ExifTags
 from escpos.printer import Usb
 
-
-# =========================
-# CONFIG
-# =========================
-
 PRINTER_WIDTH = 576  # 80mm full width
 INCOMING = Path("incoming")
 PRINTS = Path("prints")
@@ -22,16 +17,7 @@ VENDOR_ID = 0x1fc9
 PRODUCT_ID = 0x2016
 
 
-# =========================
-# PRINTER INIT
-# =========================
-
 PRINTER = Usb(VENDOR_ID, PRODUCT_ID)
-
-
-# =========================
-# ARCHIVE COUNTER
-# =========================
 
 def get_archive_number():
     if not os.path.exists(ARCHIVE_FILE):
@@ -47,10 +33,6 @@ def get_archive_number():
 
     return f"ARCHIVE {num:04d}"
 
-
-# =========================
-# EXIF EXTRACTION
-# =========================
 
 def extract_exif(img):
     iso = shutter = aperture = "N/A"
@@ -76,34 +58,25 @@ def extract_exif(img):
     return iso, shutter, aperture
 
 
-# =========================
-# IMAGE PREP FOR THERMAL
-# =========================
-
 def prepare_image(path):
     img = Image.open(path)
     img = img.convert("L")
 
-    # Resize to full width
     aspect_ratio = img.height / img.width
     new_height = int(PRINTER_WIDTH * aspect_ratio)
     img = img.resize((PRINTER_WIDTH, new_height), Image.LANCZOS)
 
-    # Strong clarity tuning
+
     img = ImageEnhance.Contrast(img).enhance(3.5)
     img = ImageEnhance.Brightness(img).enhance(1)
     img = img.filter(ImageFilter.UnsharpMask(radius=2, percent=200))
 
-    # Hard threshold for crisp blacks
+
     threshold = 110
     img = img.point(lambda x: 0 if x < threshold else 255, "1")
 
     return img
 
-
-# =========================
-# PRINT JOB
-# =========================
 
 def process_image(path):
     iso, shutter, aperture = extract_exif(Image.open(path))
@@ -119,25 +92,23 @@ def process_image(path):
 
     p = PRINTER
 
-    # Print image centered
     p.set(align="center")
     p.image(str(temp_output))
 
-    # Print metadata
+
     p.set(align="left")
     p.text("\n")
     p.text(settings_line + "\n")
     p.text(archive_line + "\n")
     p.text(timestamp + "\n")
 
-    # Print logo if exists
+
     logo_path = Path("logo.png")
     if logo_path.exists():
         p.set(align="center")
         p.text("\n")
         p.image(str(logo_path))
 
-    # Extra paper roll
     p.feed(12)
     p.cut()
 
@@ -149,10 +120,6 @@ def process_image(path):
     print("[STATUS] Physical print complete.")
     print("===================================\n")
 
-
-# =========================
-# AUTONOMOUS LOOP
-# =========================
 
 def main():
     print("ARCHIVE PRINTER ACTIVE")
