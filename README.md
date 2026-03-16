@@ -11,5 +11,3 @@ After that, I integrated the hardware. I connected a receipt printer and used a 
 Finally, I focused on making the system reliable. I designed the workflow so that once a photo is printed, it automatically moves from the “incoming” folder to a “processed” folder. This prevents the same image from printing multiple times and makes the system behave like a production pipeline rather than a simple script.
 
 By the end, the system became fully autonomous. I can drop multiple photos into the folder and they automatically process, print, and archive themselves without manual input.
-
-The biggest thing I learned from this project was how important it is to think about the entire system, not just the code. Taking an idea from concept to execution required hardware integration, software design, debugging operating system issues, and thinking about how the workflow should behave over time. It also reinforced that building something end-to-end usually involves solving many small problems step by step until the whole system works together.
