@@ -1,2 +1,15 @@
-# printing-images-via-raspberry-pi-on-billing-machine-reciept-paper
-i want to make a photobooth thing where i take pictures from my nikon dslr d40x and send it via either wifi or wire transfer to my raspberry pi b+ which is attached to my printer and prints the picture.
+H a small system that automatically prints photos from a camera onto receipt paper and archives them. The idea came from my interest in physical media and the feeling that digital photos often get forgotten in storage. I wanted to create something that would turn a photo into a small physical artifact immediately after it was taken, similar to how receipts document a moment in time.
+
+My initial idea was simple: take a photo with a camera and have it automatically print on a thermal receipt printer. But once I started thinking about it more deeply, I realized I could make it more interesting by turning it into a small archival system. I wanted each print to include technical information from the camera like ISO, shutter speed, aperture, and a timestamp, along with an automatically generated archive number so each photo would become part of a chronological record.
+
+I started by thinking about how the camera and computer would communicate. Cameras store photos as JPG files, so instead of trying to control the camera directly, I designed a system where a computer simply watches a folder for new images. Whenever a new image appears, the program processes it and prints it. I wrote this logic in Python so it runs continuously and acts like an automated pipeline.
+
+The next challenge was preparing the image for a thermal receipt printer. These printers only print in black and white and have a fixed width, so a normal photo doesn’t print clearly without processing. I built an image pipeline using the Pillow library that converts the photo to grayscale, resizes it to the exact width of the printer, increases contrast, sharpens edges, and applies a threshold so the image becomes crisp when printed on thermal paper.
+
+After that, I integrated the hardware. I connected a receipt printer and used a library that sends ESC/POS commands directly over USB. This required debugging device permissions, identifying the correct USB IDs, and figuring out how to send image data and text to the printer reliably. Once the printer was working, I added formatting so each print includes the image, the camera metadata, an archive number, and a timestamp. I also added a logo so every print has a consistent visual identity.
+
+Finally, I focused on making the system reliable. I designed the workflow so that once a photo is printed, it automatically moves from the “incoming” folder to a “processed” folder. This prevents the same image from printing multiple times and makes the system behave like a production pipeline rather than a simple script.
+
+By the end, the system became fully autonomous. I can drop multiple photos into the folder and they automatically process, print, and archive themselves without manual input.
+
+The biggest thing I learned from this project was how important it is to think about the entire system, not just the code. Taking an idea from concept to execution required hardware integration, software design, debugging operating system issues, and thinking about how the workflow should behave over time. It also reinforced that building something end-to-end usually involves solving many small problems step by step until the whole system works together.
